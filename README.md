@@ -1,2 +1,1 @@
-# newsletter-mvp
-
+# Credit Risk
