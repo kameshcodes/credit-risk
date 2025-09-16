@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PD Model: Discrimination & Calibration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    
+</head>
+<body class="text-slate-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-slate-900">PD Model Validation</h1>
+            <div class="space-x-4 text-sm md:text-base">
+                <a href="#week1" class="text-slate-600 hover:text-blue-700 transition">Discrimination</a>
+                <a href="#week2" class="text-slate-600 hover:text-blue-700 transition">Calibration</a>
+                <a href="#week3" class="text-slate-600 hover:text-blue-700 transition">Stability</a>
+                <a href="#finalproject" class="text-slate-600 hover:text-blue-700 transition">Final Project</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 md:px-6 py-8">
+        
+        <section class="text-left mb-12">
+            <h2 class="text-4xl font-bold mb-4">A Deep Dive into Discrimination & Calibration</h2>
+            <p class="mx-auto text-slate-600">This plan I have designed for beginners or intermediates in model validation trying to get a rigorous, hands-on mastery of PD model validation, with a specific focus on credit risk PD models. Each module combines theory, mathematical proofs, and practical Python coding.</p>
+        </section>
+
+        <div class="mb-12 p-6 bg-white rounded-xl shadow-lg">
+            <h3 class="text-2xl font-semibold mb-4 text-center">Your Progress</h3>
+            <div class="w-full bg-slate-200 rounded-full h-4">
+                <div id="progressBar" class="bg-blue-600 h-4 rounded-full transition-all duration-500" style="width: 0%;"></div>
+            </div>
+            <p id="progressText" class="text-center mt-2 text-slate-600 font-medium">0 / 18 Modules Complete</p>
+        </div>
+
+        <section id="concepts" class="mb-12 p-6 bg-white rounded-xl shadow-lg">
+            <h3 class="text-2xl font-semibold mb-6 text-center">Core Concepts: Discrimination vs. Calibration</h3>
+            <p class="max-w-5xl mx-auto text-slate-600 mb-6">Before diving in, it's important to understand the two key pillars of PD model validation: <i>Discrimination and Calibration</i>. <br>Each captures a different perspective on model performance:</p>
+            <div class="flex flex-col md:flex-row gap-6 justify-center items-stretch">
+                <div class="flex-1 p-6 bg-blue-50 rounded-lg border border-blue-200 clickable-card" onclick="openDiscriminationPopup()">
+                    <h4 class="text-lg font-bold text-blue-800 mb-2">Discrimination (Rank-Ordering)</h4>
+                    <p class="text-slate-700">Discrimination measures how effectively a PD model can rank borrowers by risk. In other words, how well it separates riskier borrowers from safer ones.</p>
+                    <p class="text-slate-700"><br><b>In Simple words:</b> If you take two borrowers — one who actually defaults and one who doesn't. A model with good discrimination ability should usually assign a higher PD to the defaulter.</p>
+                    <p class="text-slate-700"><br><b>Example:</b> Imagine two people:</p>
+                    <div class="pl-6">
+                        <ul class="list-disc list-inside text-slate-700 mb-2 pl-2">
+                            <li>Borrower A defaults, model gives PD = 15%</li>
+                            <li>Borrower B survives, model gives PD = 5%</li>
+                        </ul>
+                    </div>
+                    <p class="text-slate-700">This is good discrimination.</p>
+                    <div class="mt-4 font-semibold text-sm">Key Metrics: <em>AUC, Gini, KS</em></div>
+                    
+                    <!-- Add this button -->
+                    <div class="mt-4 flex justify-end">
+                        <button class="text-xs bg-blue-600 text-white px-3 py-1 rounded-full hover:bg-blue-700 transition-colors flex items-center gap-1">
+                            <span>Why it matters</span>
+                            <span>→</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center text-3xl font-bold text-slate-400 mx-4">≠</div>
+                <div class="flex-1 p-6 bg-green-50 rounded-lg border border-green-200 clickable-card" onclick="openCalibrationPopup()">
+                    <h4 class="text-lg font-bold text-green-800 mb-2">Calibration (Probability Accuracy)</h4>
+                    <p class="text-slate-700">Calibration measures how well a PD model’s predicted probabilities match the actual observed default rates. In other words, are the model's PD values consistent with how often borrowers actually default?</p>
+                    <p class="text-slate-700"><br><b>In Simple words:</b> If a model says a group of borrowers has a 10% chance of default, then roughly 10 out of 100 should actually default.</p>
+                    <p class="text-slate-700"><br><b>Example:</b> Suppose you have 1,000 borrowers with predicted PD = 10%.</p>
+                    <div class="pl-6">
+                        <ul class="list-disc list-inside text-slate-700 mb-2 pl-2">
+                            <li>If 100 of them default → model is well-calibrated.</li>
+                            <li>If only 40 default → model is underestimating risk (too optimistic).</li>
+                            <li>If 200 default → model is overestimating risk (too conservative).</li>
+                        </ul>
+                    </div>
+                    <div class="mt-4 font-semibold text-sm"><br>Key Metrics: <em>Brier Score, Calibration Plots, Hosmer-Lemeshow test</em></div>
+                    
+                    <!-- Add this button -->
+                    <div class="mt-4 flex justify-end">
+                        <button class="text-xs bg-green-600 text-white px-3 py-1 rounded-full hover:bg-green-700 transition-colors flex items-center gap-1">
+                            <span>Details</span>
+                            <span>→</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="week1" class="mb-12">
+            <h2 class="text-3xl font-bold mb-6 border-b-2 pb-2 border-slate-300">Discrimination</h2>
+            <p class="max-w-3xl text-slate-600 mb-6">This week establishes the theoretical groundwork and dives deep into the metrics of discrimination. The focus is on understanding a model's ability to separate classes (e.g., defaulters from non-defaulters), which is the first critical test of any PD model.</p>
+            <div class="space-y-4 max-w-5xl mx-auto">
+                
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="1">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 1</div>
+                            <h3 class="text-lg font-semibold ml-4">Probability & The ROC Curve</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Solidify probability foundations, understand TPR/FPR, and derive the ROC curve from first principles.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Theory & Reading:</strong> Review conditional probability & Bayes' theorem. Read "Evaluating the Performance of a Point Prediction" by Murphy & Winkler (1987). Read Steyerberg, "Clinical Prediction Models", Ch 5 on model performance.</li>
+                            <li><strong>Math Deep Dive:</strong> Manually derive True Positive Rate (Sensitivity) and False Positive Rate (1 - Specificity). Sketch a confusion matrix for different thresholds and plot the resulting points to form a ROC curve.</li>
+                            <li><strong>Coding Lab:</strong> Using a sample credit dataset (e.g., from Kaggle), load data with Pandas. Write a Python function from scratch that takes true labels and predicted probabilities, iterates through 100 thresholds, and returns the TPRs and FPRs. Plot the ROC curve using Matplotlib. Compare with `sklearn.metrics.roc_curve`.</li>
+                            <li><strong>Reflection:</strong> Why is a random model a diagonal line on the ROC plot? What does a point in the top-left corner represent?</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="2">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 2</div>
+                            <h3 class="text-lg font-semibold ml-4">The Area Under the Curve (AUC)</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Understand the probabilistic meaning of AUC and its mathematical derivation.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Theory & Reading:</strong> Read "The meaning and use of the area under a receiver operating characteristic (ROC) curve" by Hanley & McNeil (1982).</li>
+                            <li><strong>Math Deep Dive:</strong> Prove that AUC is the probability that a randomly chosen positive sample is ranked higher than a randomly chosen negative sample. Understand its relationship to the Mann-Whitney U test. How is the integral for AUC calculated in practice (trapezoidal rule)?</li>
+                            <li><strong>Coding Lab:</strong> Implement AUC from scratch using the list of TPRs/FPRs from Module 1 (trapezoidal rule). Then, implement it again using the probabilistic definition (compare all positive/negative pairs). Validate against `sklearn.metrics.roc_auc_score`. Test on an imbalanced dataset.</li>
+                            <li><strong>Reflection:</strong> What are the pros and cons of AUC? Why is it invariant to the decision threshold and probability scaling?</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="3">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 3</div>
+                            <h3 class="text-lg font-semibold ml-4">Gini Coefficient & Lorenz Curves</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Connect AUC to the Gini coefficient and understand its interpretation in credit risk.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Theory & Reading:</strong> Read resources on the Gini coefficient in economics and its application to credit scoring. Understand the concept of a Lorenz curve (or Power Curve) in this context.</li>
+                            <li><strong>Math Deep Dive:</strong> Prove the relationship: Gini = 2 * AUC - 1. Manually construct a Lorenz curve by plotting the cumulative percentage of defaulters against the cumulative percentage of applicants, ordered by score.</li>
+                            <li><strong>Coding Lab:</strong> Write a Python function to calculate the Gini coefficient from predicted probabilities and true labels. Verify the `Gini = 2 * AUC - 1` relationship using your code from Module 2.</li>
+                            <li><strong>Reflection:</strong> Why is Gini a standard metric in credit risk reporting (e.g., for IFRS 9 model validation)? How would you explain Gini to a non-technical stakeholder?</li>
+                        </ul>
+                    </div>
+                </details>
+                
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="4">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 4</div>
+                            <h3 class="text-lg font-semibold ml-4">Kolmogorov-Smirnov (KS) Statistic</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Understand the KS statistic as a measure of separation and its practical application.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Theory & Reading:</strong> Read about the two-sample KS test and its adaptation for credit model validation.</li>
+                            <li><strong>Math Deep Dive:</strong> The KS statistic is the maximum difference between the cumulative distribution functions (CDFs) of the scores for the positive and negative classes. Manually calculate this by sorting all predictions, then computing and plotting the two CDFs. The largest vertical gap is the KS.</li>
+                            <li><strong>Coding Lab:</strong> Write a Python function from scratch to calculate the KS statistic. Use `scipy.stats.ks_2samp` for comparison, but note the difference in application (your implementation is more direct for validation). Plot the two CDFs and highlight the KS statistic.</li>
+                            <li><strong>Reflection:</strong> At what score decile does the KS statistic typically occur for a good model? What are the limitations of KS compared to AUC?</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="5">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 5</div>
+                            <h3 class="text-lg font-semibold ml-4">Discrimination Metrics in Practice</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Understand the impact of imbalanced data, outliers, and model choice on discrimination metrics.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Theory & Reading:</strong> Skim "The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets" by Saito & Rehmsmeier (2015).</li>
+                            <li><strong>Math Deep Dive:</strong> Consider how AUC might remain high even if a model performs poorly on the minority class. Why is PR-AUC sometimes preferred?</li>
+                            <li><strong>Coding Lab:</strong> Take your dataset and artificially change the imbalance ratio. How do AUC, Gini, and KS change? Train two models (e.g., Logistic Regression, Gradient Boosting) on the same data. Compare their discrimination metrics. Do they tell the same story?</li>
+                            <li><strong>Reflection:</strong> Which discrimination metric would you prioritize for a fraud detection model vs. a standard retail credit model? Why?</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="6">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 6</div>
+                            <h3 class="text-lg font-semibold ml-4">Regulatory Context for Discrimination</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Understand how regulators (e.g., ECB, BoE) view and mandate discrimination analysis for IRB/IFRS 9 models.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Resource Hunt:</strong> Find and read key regulatory documents. Search for "ECB guide to internal models" and "Bank of England - Prudential Regulation Authority" papers on PD model validation. Note the specific metrics they require.</li>
+                            <li><strong>Application:</strong> Draft a one-page summary of the discrimination section of a model validation report. It should include tables and text explaining the AUC, Gini, and KS results for a hypothetical model.</li>
+                            <li><strong>Reflection:</strong> What are typical "acceptable" thresholds for Gini/AUC in the industry? Why is monitoring the stability of these metrics over time so important?</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="7">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 7</div>
+                            <h3 class="text-lg font-semibold ml-4">Week 1 Review & Consolidation</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Consolidate knowledge of discrimination metrics and clean up code from the week.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Review:</strong> Re-read your notes from the week. Rederive the Gini = 2 * AUC - 1 proof. Explain the probabilistic meaning of AUC out loud.</li>
+                            <li><strong>Coding Lab:</strong> Organize all your "from scratch" functions into a single Python utility script (`discrimination_metrics.py`). Add docstrings and type hinting. Write unit tests to ensure they match scikit-learn's outputs.</li>
+                            <li><strong>Mini-Project:</strong> Download a new credit risk dataset. Perform a full discrimination analysis and write a short report on your findings, comparing at least two different models.</li>
+                        </ul>
+                    </div>
+                </details>
+
+            </div>
+        </section>
+
+        <section id="week2" class="mb-12">
+            <h2 class="text-3xl font-bold mb-6 border-b-2 pb-2 border-slate-300">Calibration</h2>
+            <p class="max-w-3xl text-slate-600 mb-6">This week moves beyond rank-ordering to the critical topic of calibration. A model with great discrimination but poor calibration is dangerous for provisioning and pricing. We will explore how to measure and visualize the accuracy of predicted probabilities.</p>
+            <div class="space-y-4 max-w-5xl mx-auto">
+                
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="8">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 8</div>
+                            <h3 class="text-lg font-semibold ml-4">Introduction to Calibration & Proper Scoring Rules</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Understand the concept of calibration, proper scoring rules, and derive the Brier Score.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Theory & Reading:</strong> Read the original paper: "Verification of forecasts expressed in terms of probability" by Brier (1950). Read about "proper scoring rules" (what makes a metric "proper"?).</li>
+                            <li><strong>Math Deep Dive:</strong> Derive the Brier Score formula: `(1/N) * sum(p_i - o_i)^2`. Decompose the Brier Score into its three components: Reliability, Resolution, and Uncertainty. This is crucial—work through the derivation carefully (see Steyerberg or online stats resources).</li>
+                            <li><strong>Coding Lab:</strong> Implement the Brier Score from scratch. Validate against `sklearn.metrics.brier_score_loss`. Calculate it for your models from Week 1. How do they compare on calibration vs. discrimination?</li>
+                            <li><strong>Reflection:</strong> Why is Log-Loss also a proper scoring rule? What does the Brier Score decomposition tell you that the single score doesn't?</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="9">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 9</div>
+                            <h3 class="text-lg font-semibold ml-4">Calibration Plots (Reliability Diagrams)</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Learn to create and interpret calibration plots, the primary tool for visualizing model calibration.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Theory & Reading:</strong> Read the scikit-learn user guide on "Probability calibration". Understand the x-axis (Mean predicted probability) and y-axis (Fraction of positives).</li>
+                            <li><strong>Math Deep Dive:</strong> The key is binning. How does the choice of binning strategy (equal width vs. equal frequency) affect the plot? Manually work through an example with 20 predictions, putting them into 4 bins and calculating the axes' values.</li>
+                            <li><strong>Coding Lab:</strong> Write a function from scratch to generate the data for a calibration plot (bin predictions, calculate mean predicted value and fraction of positives per bin). Plot it using Matplotlib. Compare with `sklearn.calibration.CalibrationDisplay`. Plot your models from Week 1. Are they over- or under-confident?</li>
+                            <li><strong>Reflection:</strong> What does an S-shaped calibration curve imply? A steep one? What is the purpose of the histogram of predicted probabilities often shown with the plot?</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="10">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 10</div>
+                            <h3 class="text-lg font-semibold ml-4">Hosmer-Lemeshow (HL) Test</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Understand the mechanics, application, and severe limitations of the HL test.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Theory & Reading:</strong> Read critiques of the HL test. Search for "Hosmer-Lemeshow test limitations". Understand that it's a goodness-of-fit test, not a direct measure of calibration quality.</li>
+                            <li><strong>Math Deep Dive:</strong> Derive the HL statistic. It follows a Chi-squared distribution with `g-2` degrees of freedom (where `g` is the number of groups). Understand the null hypothesis (H0: The model is well-calibrated). A low p-value *rejects* good calibration.</li>
+                            <li><strong>Coding Lab:</strong> Find a Python implementation of the HL test (it's not in sklearn, look for it in `statsmodels` or other stats packages, or implement from scratch). Calculate it for your models. How does the p-value change with the number of bins?</li>
+                            <li><strong>Reflection:</strong> Why is the HL test heavily criticized, especially for large datasets? Why are calibration plots often preferred by practitioners?</li>
+                        </ul>
+                    </div>
+                </details>
+                
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="11">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 11</div>
+                            <h3 class="text-lg font-semibold ml-4">Recalibration Techniques</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Learn about Platt Scaling and Isotonic Regression as methods to fix poor calibration.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Theory & Reading:</strong> Read "Obtaining calibrated probabilities from boosting" by Niculescu-Mizil & Caruana (2005). Understand the difference between parametric (Platt) and non-parametric (Isotonic) methods.</li>
+                            <li><strong>Math Deep Dive:</strong> Platt Scaling is simply fitting a logistic regression model on the outputs of your primary model. Isotonic Regression is a non-parametric method that finds a non-decreasing approximation of a function. What are the assumptions of each?</li>
+                            <li><strong>Coding Lab:</strong> Use `sklearn.calibration.CalibratedClassifierCV`. Take a poorly calibrated model (e.g., a raw SVM or Naive Bayes) and apply both `method='sigmoid'` (Platt) and `method='isotonic'`. Plot the calibration curves before and after. Observe the improvement.</li>
+                            <li><strong>Reflection:</strong> When would you prefer Isotonic Regression over Platt Scaling, and vice-versa? What is the risk of overfitting during recalibration? (Hint: use a separate calibration set).</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="12">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 12</div>
+                            <h3 class="text-lg font-semibold ml-4">The Discrimination-Calibration Trade-off</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Synthesize the concepts from both weeks and understand their interplay.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Theory & Reading:</strong> Reflect on the week's learnings. There are no new papers today.</li>
+                            <li><strong>Thought Experiment:</strong> Can a model have a high AUC but terrible calibration? (Yes, imagine multiplying all probabilities by 0.5 - rank order is preserved, but probabilities are wrong). Can a model be well-calibrated but have poor AUC? (Yes, imagine predicting the base default rate for every single customer).</li>
+                            <li><strong>Coding Lab:</strong> Take your best discriminating model from Week 1. Apply the recalibration techniques from Module 11. Did AUC change? Did the Brier score improve? Quantify the trade-off.</li>
+                            <li><strong>Reflection:</strong> For IFRS 9 Expected Credit Loss (ECL) calculation, which is more important: discrimination or calibration? Why?</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="13">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 13</div>
+                            <h3 class="text-lg font-semibold ml-4">Advanced Topics & Review</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Explore more advanced topics and consolidate knowledge for the final project.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Explore:</strong> Research other calibration metrics like Expected Calibration Error (ECE). Look into Bayesian methods for calibration.</li>
+                            <li><strong>Coding Lab:</strong> Combine your utility scripts from both weeks into a single model validation library. Create a master function that takes `y_true`, `y_pred` and produces a full report with all key metrics and plots.</li>
+                            <li><strong>Final Project Prep:</strong> Choose your final dataset. Perform exploratory data analysis and train two candidate models you wish to compare in your final report.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="14">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 14</div>
+                            <h3 class="text-lg font-semibold ml-4">Final Project Execution</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Apply all learned concepts to produce a comprehensive mini model validation report.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Task:</strong> Using your two models from yesterday and your validation library, generate all necessary outputs.</li>
+                            <li><strong>Write-up:</strong> Structure your report as outlined in the "Final Project" section below. Focus on clear interpretations, business implications, and a final model recommendation justified by your findings.</li>
+                            <li><strong>Self-Correction:</strong> Does your report clearly distinguish between discrimination and calibration? Is every plot and table clearly labeled and explained? Have you stated the limitations of your analysis?</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="week3" class="mb-12">
+            <h2 class="text-3xl font-bold mb-6 border-b-2 pb-2 border-slate-300">Stability: Model Performance Over Time</h2>
+            <p class="max-w-3xl text-slate-600 mb-6">Stability testing ensures that a model's performance remains consistent over time and across different populations. A model might show excellent discrimination and calibration during development but deteriorate significantly when deployed, making stability analysis critical for ongoing model governance.</p>
+            <div class="space-y-4 max-w-5xl mx-auto">
+                
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="15">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 15</div>
+                            <h3 class="text-lg font-semibold ml-4">Population Stability Index (PSI)</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Understand PSI as a measure of population drift and learn to interpret PSI thresholds.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Theory & Reading:</strong> Study the PSI formula and its interpretation. Understand why population drift matters for model stability and regulatory compliance.</li>
+                            <li><strong>Math Deep Dive:</strong> Derive the PSI formula: PSI = Σ (Actual% - Expected%) * ln(Actual%/Expected%). Understand why it's based on information theory and what the logarithmic term represents.</li>
+                            <li><strong>Coding Lab:</strong> Implement PSI from scratch. Create functions to bin variables, calculate expected vs actual distributions, and compute PSI scores. Test with simulated population drift scenarios.</li>
+                            <li><strong>Reflection:</strong> What PSI thresholds trigger model review vs replacement? How does binning strategy affect PSI calculations?</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="16">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 16</div>
+                            <h3 class="text-lg font-semibold ml-4">Characteristic Stability Index (CSI)</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Learn CSI for monitoring individual variable stability and understand its relationship to PSI.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Theory & Reading:</strong> Understand CSI as variable-level stability measurement. Learn how CSI helps identify which specific features are driving population instability.</li>
+                            <li><strong>Math Deep Dive:</strong> CSI uses the same formula as PSI but applies to individual characteristics. Understand the interpretation: which variables have shifted most significantly?</li>
+                            <li><strong>Coding Lab:</strong> Build a comprehensive stability monitoring dashboard. Calculate CSI for all model variables and rank them by stability. Create visualizations showing distribution shifts over time.</li>
+                            <li><strong>Reflection:</strong> How do you prioritize variable-level remediation when multiple CSI scores exceed thresholds? What's the relationship between CSI and feature importance?</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="17">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 17</div>
+                            <h3 class="text-lg font-semibold ml-4">Performance Stability Testing</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Monitor how discrimination and calibration metrics evolve over time and across cohorts.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Theory & Reading:</strong> Study regulatory expectations for ongoing performance monitoring. Understand the difference between population stability and performance stability.</li>
+                            <li><strong>Practical Analysis:</strong> Track AUC, Gini, and Brier scores across multiple time periods. Identify acceptable ranges of variation and triggers for model recalibration or redevelopment.</li>
+                            <li><strong>Coding Lab:</strong> Create rolling window analysis of model performance. Build statistical tests to detect significant performance deterioration. Implement automated alerting systems.</li>
+                            <li><strong>Reflection:</strong> What performance deterioration patterns suggest model obsolescence vs temporary market conditions? How do you balance model stability with responsiveness to changing conditions?</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="day-card bg-white p-4 rounded-lg shadow-md transition hover:shadow-xl group" data-day="18">
+                    <summary class="flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="text-sm font-bold bg-slate-100 text-slate-700 rounded-full w-16 text-center py-1">Module 18</div>
+                            <h3 class="text-lg font-semibold ml-4">Regulatory Framework & Documentation</h3>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button class="complete-btn bg-green-100 text-green-800 text-xs font-bold py-1 px-3 rounded-full hover:bg-green-200">Mark Complete</button>
+                            <span class="transform transition-transform duration-300 group-open:rotate-180">▼</span>
+                        </div>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t">
+                        <p><strong>Objectives:</strong> Understand regulatory requirements for stability testing and learn to document findings appropriately.</p>
+                        <ul class="list-disc list-inside space-y-2 mt-2 text-slate-700">
+                            <li><strong>Regulatory Research:</strong> Study ECB, EBA, and local regulatory guidance on model stability requirements. Understand IFRS 9 and Basel expectations for ongoing monitoring.</li>
+                            <li><strong>Documentation:</strong> Learn to structure stability test results for regulatory consumption. Practice writing executive summaries that communicate technical findings to senior management.</li>
+                            <li><strong>Case Studies:</strong> Analyze real-world examples of model instability events. Study how leading banks have handled population drift and performance deterioration.</li>
+                            <li><strong>Integration:</strong> Combine discrimination, calibration, and stability analysis into a comprehensive model monitoring framework suitable for production deployment.</li>
+                        </ul>
+                    </div>
+                </details>
+
+            </div>
+        </section>
+
+        <section class="mb-12 p-6 bg-white rounded-xl shadow-lg">
+            <h3 class="text-2xl font-semibold mb-4 text-center">Interactive Metric Comparison</h3>
+            <p class="max-w-3xl mx-auto text-slate-600 mb-6 text-center">This chart helps synthesize the properties of the key metrics you've learned. Click on the bars to see how different metrics behave across key validation dimensions. A high score (5) means the metric is strongly defined by that property.</p>
+            <div class="chart-container">
+                <canvas id="metricsChart"></canvas>
+            </div>
+        </section>
+
+        <section id="finalproject" class="p-8 bg-blue-800 text-white rounded-xl shadow-2xl">
+            <h2 class="text-3xl font-bold mb-4 text-center">Final Project: Mini Validation Report</h2>
+            <p class="max-w-3xl mx-auto text-center text-blue-100 mb-6">The culmination of your two weeks of study. Your task is to produce a concise yet rigorous validation report comparing two PD models (e.g., Logistic Regression vs. XGBoost) on a credit risk dataset of your choice. This demonstrates mastery by combining technical execution with business interpretation.</p>
+            <div class="grid md:grid-cols-2 gap-6 text-blue-50">
+                <div class="bg-blue-700 p-4 rounded-lg">
+                    <h4 class="font-bold mb-2">Required Sections:</h4>
+                    <ul class="list-decimal list-inside space-y-1">
+                        <li><strong>Executive Summary:</strong> High-level findings and model recommendation.</li>
+                        <li><strong>Data Overview:</strong> Brief description of the dataset and target variable.</li>
+                        <li><strong>Discrimination Analysis:</strong> ROC/AUC, Gini, and KS results for both models. Interpretation of which model is better at rank-ordering.</li>
+                        <li><strong>Calibration Analysis:</strong> Brier scores, calibration plots, and HL test results. Discussion on the reliability of each model's probabilities.</li>
+                        <li><strong>Synthesis & Recommendation:</strong> Overall comparison, discussion of the trade-offs, and a final, justified recommendation for model selection.</li>
+                        <li><strong>Appendix:</strong> Code snippets for your custom metric functions.</li>
+                    </ul>
+                </div>
+                <div class="bg-blue-700 p-4 rounded-lg">
+                    <h4 class="font-bold mb-2">Key Resources & Repositories:</h4>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li><strong>Book:</strong> Steyerberg, E. W. (2009). Clinical Prediction Models.</li>
+                        <li><strong>Paper:</strong> Brier, G. W. (1950). Verification of forecasts expressed in terms of probability.</li>
+                        <li><strong>Paper:</strong> Hanley, J. A., & McNeil, B. J. (1982). The meaning and use of the area under a ROC curve.</li>
+                        <li><strong>Code:</strong> Scikit-learn documentation on metrics and calibration.</li>
+                        <li><strong>Data:</strong> Kaggle (e.g., "Home Credit Default Risk", "Give Me Some Credit").</li>
+                        <li><strong>Regulatory:</strong> Search ECB/PRA websites for guidelines on internal models.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center py-6 bg-slate-100 mt-12">
+        <p class="text-slate-600">Study plan designed for deep, actionable learning.</p>
+    </footer>
+
+    <!-- Popup Modal -->
+    <div id="discriminationPopup" class="popup-overlay">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h2 class="popup-title">Why Discrimination Matters in Credit Risk</h2>
+                <button class="close-btn" onclick="closePopup()">&times;</button>
+            </div>
+            <div class="popup-article">
+                <p>When a bank lends money, it cannot treat every borrower the same way. Some are safe, others are risky. <strong><em>Discrimination in a PD model is about how well the model ranks borrowers by credit risk.</em></strong> Think of it as lining borrowers up from <strong>"safest"</strong> to <strong>"riskiest."</strong> If this ranking is strong, almost everything the bank does afterwards becomes more reliable.</p>
+                
+                <p><strong>The first step is knowing who is safer and who is riskier.</strong> Imagine a large pharmaceutical company with stable earnings and strong reserves, compared to a small mining contractor whose income depends on volatile commodity prices. A good discrimination model should place the pharma company in the <em>safer group</em> and the contractor in the <em>riskier group</em>.</strong></p>
+                
+                <p>Once borrowers are ranked, the bank can decide <strong>who should be approved and who should be declined.</strong> Strong discrimination ensures that the safer names get access to credit, while the riskiest names are filtered out. A poor model can do the opposite: <em>letting weak companies in while rejecting strong ones</em>, which is <strong><em>the worst possible outcome.</em></strong></p>
+                
+                <p>Discrimination also helps in <strong>risk-based pricing.</strong> Safer borrowers gets <em>lower interest rates</em> because their chance of default is low, while riskier borrowers pay <em>higher interest</em> to compensate the bank for taking on more risk. If discrimination is weak, all borrowers may end up paying the same rate, leaving the bank <strong><em>under-compensated for risky exposures.</em></strong></p>
+                
+                <p>Another area is <strong>loan structuring.</strong> Not all loans look the same. A strong corporate might get a simple unsecured loan, while a weaker obligor may need to provide <em>collateral, accept tighter covenants, or agree to a shorter maturity.</em> Discrimination tells the bank when these protections are necessary. Without it, the bank might give weak borrowers too much freedom, creating <strong>large losses when they struggle.</strong></p>
+                
+                <p>The importance of discrimination continues after approval. It also supports <strong>portfolio monitoring and early warning systems.</strong> Risky borrowers should be watched more closely, with regular financial reviews or watchlist status. If the model cannot separate risk properly, these borrowers will <em>"hide in the crowd,"</em> and problems only appear when <strong><em>it is too late.</em></strong></p>
+                
+                <p><strong>Finally, discrimination has a strategic impact on how the bank manages its balance sheet.</strong> It helps the bank decide not only <strong>who to lend to</strong>, but also <strong>how much</strong>, and under <strong>what loan terms</strong>. It also ensures that capital is directed to borrowers with the best balance between risk and return.</p>
+                
+                <p><strong><em>In short, discrimination matters because it protects the bank at every stage</em></strong>: from the <strong>front end</strong> (approvals, pricing, structuring) to the <strong>back end</strong> (monitoring, portfolio risk, capital allocation). Without it, the bank cannot confidently manage lending or safeguard its capital.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calibration Popup Modal -->
+    <div id="calibrationPopup" class="popup-overlay">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h2 class="popup-title">Calibration: Details</h2>
+                <button class="close-btn" onclick="closeCalibrationPopup()">&times;</button>
+            </div>
+            <div class="popup-article">
+                <p>Knowing who is safer and who is riskier is only half the story. Banks also need to know whether the probability of default (PD) assigned to those borrowers align with reality. This is where calibration comes in. <strong>Calibration checks whether the predicted probabilities of default actually align with what happens in the real world.</strong> For example, if a model says a borrower has a 5% chance of default, then across a group of similar borrowers, <em>roughly 5 out of every 100 should default.</em></p>
+            
+                <h3 class="text-xl font-bold mb-4 mt-6 text-green-800">Customer Level vs Portfolio Level</h3>
+                <p>You may ask a question here that whether PD models are used at the customer level or the portfolio level? <br><br><strong><em>The answer is:</em></strong> At the application stage, PDs are always assigned at the <strong>individual borrower level.</strong> Each customer gets their own probability of default:</p>
+                
+                <div class="bg-green-50 p-4 rounded-lg my-4">
+                    <ul class="list-disc list-inside text-slate-700">
+                        <li>Borrower A → PD = 2%</li>
+                        <li>Borrower B → PD = 10%</li>
+                        <li>Borrower C → PD = 25%</li>
+                    </ul>
+                </div>
+                
+                <p>These outputs helps in taking decisions such as <em>loan approval, deciding interest rates, and monitoring.</em></p>
+                
+                <p>However, when it comes to calibration, <strong><em>the evaluation has to happen at the group level, not the individual borrower level.</em></strong> This is because a single borrower either defaults or does not, and that one single outcome cannot validate validate whether a predicted PD of 10% was accurate.</p>
+                
+                <h3 class="text-xl font-bold mb-4 mt-6 text-green-800">How Calibration Is Validated</h3>
+                <p>To validate calibration, we look at <strong>groups of borrowers with similar PDs</strong> and compare the predicted probability with the observed rate of default. Suppose 1,000 borrowers are each assigned PD ≈ 10%. In a well-calibrated model, <strong><em>about 100 of them should default.</em></strong></p>
+                
+                <div class="bg-orange-50 p-4 rounded-lg ">
+                    <p><strong>Risk teams typically:</strong></p>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>Create buckets (by PD ranges, deciles, or rating grades)</li>
+                        <li>Compare the average predicted PD of each bucket with its observed default rate</li>
+                        <li>If the two align, calibration is good. If not, the model may be <strong><em>too optimistic (underestimates risk)</em></strong> or <strong><em>too conservative (overestimates risk).</em></strong></li>
+                    </ul>
+                </div>
+
+                
+                <p><br>This distinction is important because <strong><em>a model can rank borrowers correctly (good discrimination) but still be miscalibrated.</em></strong></p>
+                
+                <div class="bg-yellow-50 p-4 rounded-lg ">
+                <p class="mb-1 mt-4"><strong>Too Optimistic (underestimation):</strong></p>
+                <ul class="list-disc list-inside ml-4 mt-0 space-y-1">
+                    <li>Model predicts PD = 2%, reality = 8%</li>
+                    <li><strong><em>Provisions and capital are too low</em></strong></li>
+                    <li>Bank faces unexpected losses and regulatory risk</li>
+                </ul>
+                
+                <p class="mb-1 mt-4"><strong>Too Conservative (overestimation):</strong></p>
+                <ul class="list-disc list-inside ml-4 mt-0 space-y-1">
+                    <li>Model predicts PD = 10%, reality = 3%</li>
+                    <li><strong><em>Excess capital is locked up</em></strong></li>
+                    <li>Good borrowers are rejected or overpriced, reducing profitability</li>
+                </ul>
+                </div>
+
+                <p class="mt-4"><strong>Calibration matters because it directly impacts both regulatory compliance and business outcomes.</strong></p>
+                
+                <h3 class="text-xl font-bold mb-4 mt-6 text-green-800">Regulatory and Business Impact</h3>
+                <p>Under <strong>IFRS-9</strong>, expected credit losses are calculated using PDs, LGDs, and EADs.</p>
+                <ul class="list-disc list-inside ml-4 space-y-1">
+                    <li>If <em>PDs are underestimated</em>, the bank sets aside too little money in provisions. When more borrowers default than expected, will weaken capital ratios and create <strong>regulatory concerns, since the bank appears under-prepared for credit risk.</strong></li>
+                    <li>If PDs are <em>overestimated</em>, the bank ends up holding unnecessary reserves, which <strong>ties up capital</strong> that could be used for lending or investments to earn profit.</li>
+                </ul>
+                
+                <p><strong><br>Basel capital requirements</strong> face the same challenge because inaccurate PDs distort how much regulatory capital must be held.</p>
+                
+                <p>The business will also be impacted as:</p>
+                <ul class="list-disc list-inside ml-4 space-y-1">
+                    <li><em>Too optimistic models</em> → risky borrowers approved, later high default losses.</li>
+                    <li><em>Too conservative models</em> → strong borrowers rejected or overpriced, business lost to competitors.</li>
+                </ul>
+                
+                <p><strong><em><br>Both outcomes hurt profitability and customer trust.</em></strong></p>
+                                
+                <h3 class="text-xl font-bold mb-4 mt-6 text-green-800">Conclusion</h3>
+                <p><strong><em>Discrimination tells us who is riskier, while calibration tells us how risky, exactly.</em></strong> PDs are applied borrower by borrower, but their credibility is only proven when tested across groups. Without proper calibration, the numbers cannot be trusted, and <strong>every downstream decision from provisioning and capital planning to pricing and strategy is put at risk.</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
