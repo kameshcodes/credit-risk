@@ -45,7 +45,8 @@
             <h3 class="text-2xl font-semibold mb-6 text-center">Core Concepts: Discrimination vs. Calibration</h3>
             <p class="max-w-5xl mx-auto text-slate-600 mb-6">Before diving in, it's important to understand the two key pillars of PD model validation: <i>Discrimination and Calibration</i>. <br>Each captures a different perspective on model performance:</p>
             <div class="flex flex-col md:flex-row gap-6 justify-center items-stretch">
-                <div class="flex-1 p-6 bg-blue-50 rounded-lg border border-blue-200 clickable-card" onclick="openDiscriminationPopup()">
+                <div class="flex-1 p-6 bg-blue-50 rounded-lg border border-blue-200 clickable-card concept-card relative" data-concept="discrimination">
+                    <button class="concept-complete-btn bg-red-500 text-white text-xs font-bold py-1 px-2 rounded-full absolute top-2 right-2 z-10">Mark Complete</button>
                     <h4 class="text-lg font-bold text-blue-800 mb-2">Discrimination (Rank-Ordering)</h4>
                     <p class="text-slate-700">Discrimination measures how effectively a PD model can rank borrowers by risk. In other words, how well it separates riskier borrowers from safer ones.</p>
                     <p class="text-slate-700"><br><b>In Simple words:</b> If you take two borrowers — one who actually defaults and one who doesn't. A model with good discrimination ability should usually assign a higher PD to the defaulter.</p>
@@ -59,7 +60,6 @@
                     <p class="text-slate-700">This is good discrimination.</p>
                     <div class="mt-4 font-semibold text-sm">Key Metrics: <em>AUC, Gini, KS</em></div>
                     
-                    <!-- Add this button -->
                     <div class="mt-4 flex justify-end">
                         <button class="text-xs bg-blue-600 text-white px-3 py-1 rounded-full hover:bg-blue-700 transition-colors flex items-center gap-1">
                             <span>Why it matters</span>
@@ -68,7 +68,8 @@
                     </div>
                 </div>
                 <div class="flex items-center justify-center text-3xl font-bold text-slate-400 mx-4">≠</div>
-                <div class="flex-1 p-6 bg-green-50 rounded-lg border border-green-200 clickable-card" onclick="openCalibrationPopup()">
+                <div class="flex-1 p-6 bg-green-50 rounded-lg border border-green-200 clickable-card concept-card relative" data-concept="calibration">
+                    <button class="concept-complete-btn bg-red-500 text-white text-xs font-bold py-1 px-2 rounded-full absolute top-2 right-2 z-10">Mark Complete</button>
                     <h4 class="text-lg font-bold text-green-800 mb-2">Calibration (Probability Accuracy)</h4>
                     <p class="text-slate-700">Calibration measures how well a PD model’s predicted probabilities match the actual observed default rates. In other words, are the model's PD values consistent with how often borrowers actually default?</p>
                     <p class="text-slate-700"><br><b>In Simple words:</b> If a model says a group of borrowers has a 10% chance of default, then roughly 10 out of 100 should actually default.</p>
@@ -82,7 +83,6 @@
                     </div>
                     <div class="mt-4 font-semibold text-sm"><br>Key Metrics: <em>Brier Score, Calibration Plots, Hosmer-Lemeshow test</em></div>
                     
-                    <!-- Add this button -->
                     <div class="mt-4 flex justify-end">
                         <button class="text-xs bg-green-600 text-white px-3 py-1 rounded-full hover:bg-green-700 transition-colors flex items-center gap-1">
                             <span>Details</span>

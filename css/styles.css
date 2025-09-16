@@ -118,3 +118,46 @@ details > summary::-webkit-details-marker {
         transform: translate(-50%, -50%) scale(1);
     }
 }
+
+/* Concept card completion styles */
+.concept-mark-complete {
+    background-color: #fef2f2 !important; /* Very light red background */
+    border-color: #fca5a5 !important; /* Light red border */
+}
+
+.concept-in-progress {
+    background-color: #fffbeb !important; /* Very light yellow background */
+    border-color: #fde68a !important; /* Light yellow border */
+}
+
+.concept-completed {
+    background-color: #f0fdf4 !important; /* Very light green background */
+    border-color: #bbf7d0 !important; /* Light green border */
+}
+
+.concept-completed h4 {
+    color: #16a34a !important; /* Darker green for titles */
+}
+
+.concept-complete-btn {
+    cursor: pointer; /* Enable clicking */
+    pointer-events: auto; /* Enable clicking */
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    transition: all 0.3s ease;
+}
+
+/* Hover effects for different states */
+.concept-complete-btn:hover.bg-red-500 {
+    background-color: #dc2626 !important; /* Darker red on hover */
+}
+
+.concept-complete-btn:hover.bg-yellow-500 {
+    background-color: #d97706 !important; /* Darker yellow on hover */
+}
+
+.concept-complete-btn:hover.bg-green-500 {
+    background-color: #16a34a !important; /* Darker green on hover */
+}
